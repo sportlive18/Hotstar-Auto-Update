@@ -33,8 +33,8 @@ jobs:
           # Or if you have requirements.txt:
           # pip install -r requirements.txt
 
-      - name: Run s.py
-        run: python s.py
+      - name: Run hotstar.py
+        run: python hotstar.py
 
       - name: Commit and Push Changes
         run: |
