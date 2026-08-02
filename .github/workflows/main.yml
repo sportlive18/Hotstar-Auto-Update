@@ -2,48 +2,53 @@ name: Update DRM Playlist
 on:
   schedule:
     - cron: "7 * * * *" 
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:
   push:
-    branches:
-      - main
-    paths:
-      - 'hotstar.py'
+    branches: [ main ]
+    paths: [ 'hotstar.py' ]
 
 jobs:
   update-playlist:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Faster than ubuntu-latest
     concurrency:
       group: update-playlist
-      cancel-in-progress: false
+      cancel-in-progress: true
     permissions:
       contents: write
+    
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Python
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            hotstar.py
+            playlist.m3u
+      
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-
+          python-version: '3.11'  # Specific version
+          cache: 'pip'
+      
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests pytz
-          # Or if you have requirements.txt:
-          # pip install -r requirements.txt
-
-      - name: Run hotstar.py
+        run: pip install --no-cache-dir requests pytz
+      
+      - name: Run updater
         run: python hotstar.py
-
-      - name: Commit and Push Changes
+        timeout-minutes: 3
+      
+      - name: Push updates
+        if: github.event_name != 'pull_request'
         run: |
-          git config --global user.name "sportlive18"
-          git config --global user.email "271363488+sportlive18@users.noreply.github.com"
+          git config user.name "sportlive18"
+          git config user.email "271363488+sportlive18@users.noreply.github.com"
+          
+          if git diff --quiet playlist.m3u; then
+            echo "No changes"
+            exit 0
+          fi
+          
           git add playlist.m3u
-          git commit -m "Auto-update playlists: $(date)" || echo "No changes to commit"
-          for i in 1 2 3 4 5; do
-            git pull --rebase origin main && git push && break
-            echo "Push failed, retrying in 5s... (attempt $i)"
-            sleep 5
-          done
+          git commit -m "Update: $(date -u +'%Y%m%d-%H%M')"
+          git push --force-with-lease origin main
