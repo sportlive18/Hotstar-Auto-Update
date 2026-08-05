@@ -1,6 +1,6 @@
 import urllib.request
 import urllib.error
-url = 'https://jhsevetns-fhd.rtxcric.workers.dev/playlist.m3u'
+url = 'https://jhs-channels.rtxcric.workers.dev/playlist.m3u'
 # We MUST use a specific User-Agent like OTT Navigator, TiviMate, or okhttp to get the playlist
 headers = {
     'User-Agent': 'OTT Navigator'
