@@ -1,7 +1,7 @@
-name: Update DRM Playlist
+name: Update Hotstar Playlist
 on:
   schedule:
-    - cron: "7 * * * *" 
+    - cron: '0 */3 * * *'
   workflow_dispatch: # Allows manual triggering
   push:
     branches:
