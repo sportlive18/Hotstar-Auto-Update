@@ -5,7 +5,7 @@ url = 'https://jhs-channels.rtxcric.workers.dev/playlist.m3u'
 headers = {
     'User-Agent': 'OTT Navigator'
 }
-req = urllib.request.Request(url, headers=headers)
+req = urllib.request.Request(url, headers=headers) 
 try:
     print(f"Fetching playlist from {url}...")
     with urllib.request.urlopen(req) as response:
